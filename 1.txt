@@ -1,0 +1,83 @@
+# ==============================================================================
+#  InstaGrowth AI – 4-Agent System  (10 CAP/IDEA/SCH per niche → 10×3×10 = 300)
+# ==============================================================================
+import subprocess, sys, os, json, re, random, asyncio, gradio as gr, nest_asyncio, time, tempfile, zipfile
+from datetime import datetime, timedelta
+from pathlib import Path
+from dataclasses import dataclass, asdict
+from typing import List, Dict
+
+# Your InstaGrowth AI main logic here
+# (Include all classes, functions, async methods, and processing code)
+# Example structure:
+
+@dataclass
+class ContentIdea:
+    niche: str
+    ideas: List[str]
+
+@dataclass
+class Caption:
+    post_id: int
+    text: str
+
+@dataclass
+class HashtagSuggestion:
+    post_id: int
+    hashtags: List[str]
+
+@dataclass
+class Schedule:
+    post_id: int
+    datetime: datetime
+
+# Async functions for each agent
+async def generate_content_ideas(niche: str) -> ContentIdea:
+    # Replace with actual logic
+    ideas = [f"{niche} idea {i}" for i in range(10)]
+    return ContentIdea(niche, ideas)
+
+async def generate_captions(post_id: int) -> Caption:
+    # Replace with actual logic
+    text = f"Caption for post {post_id}"
+    return Caption(post_id, text)
+
+async def generate_hashtags(post_id: int) -> HashtagSuggestion:
+    hashtags = [f"#hashtag{i}" for i in range(10)]
+    return HashtagSuggestion(post_id, hashtags)
+
+async def schedule_posts(post_id: int) -> Schedule:
+    post_time = datetime.now() + timedelta(days=random.randint(0,5))
+    return Schedule(post_id, post_time)
+
+# Main async orchestrator
+async def main():
+    niches = ["Travel", "Fashion", "Food"]
+    all_ideas = []
+    for niche in niches:
+        ideas = await generate_content_ideas(niche)
+        all_ideas.append(asdict(ideas))
+    for idx, niche_ideas in enumerate(all_ideas):
+        for i, idea in enumerate(niche_ideas['ideas']):
+            caption = await generate_captions(i)
+            hashtags = await generate_hashtags(i)
+            schedule = await schedule_posts(i)
+            print(f"Niche: {niche_ideas['niche']}, Idea: {idea}")
+            print(f"Caption: {caption.text}")
+            print(f"Hashtags: {hashtags.hashtags}")
+            print(f"Scheduled for: {schedule.datetime}")
+            print("----------")
+
+# Run orchestrator in Jupyter/Gradio environments
+nest_asyncio.apply()
+asyncio.run(main())
+
+# Gradio UI (if any)
+def gradio_interface():
+    with gr.Blocks() as demo:
+        gr.Markdown("## InstaGrowth AI Dashboard")
+        # Add input/output components here
+    demo.launch()
+
+# Uncomment to run Gradio interface
+# gradio_interface()
